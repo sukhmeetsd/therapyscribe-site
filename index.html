@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TherapyScribe — Coming Soon</title>
-<meta name="description" content="Session notes that never leave your Mac. Launching soon.">
+<title>Coming Soon</title>
+<meta name="description" content="Something that gives you your evenings back. Coming soon.">
 <style>
   :root {
     --leaf: #6fcf97; --mist: #cfe8d9; --glow: #a8e6c3;
@@ -17,23 +17,16 @@
     color: #e9f5ee; display: flex; flex-direction: column; align-items: center;
     min-height: 100%; overflow-x: hidden; padding: 48px 20px;
   }
-  .leaves { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
-  .leaf {
-    position: absolute; top: -5vh; font-size: 18px; opacity: .35;
-    animation: fall linear infinite;
-  }
-  @keyframes fall {
-    to { transform: translateY(110vh) rotate(360deg); }
-  }
+  #sky { position: fixed; inset: 0; z-index: 0; }
   main { position: relative; z-index: 1; text-align: center; max-width: 560px; }
   .badge {
     display: inline-block; font-size: 12px; letter-spacing: .18em; text-transform: uppercase;
     color: var(--leaf); border: 1px solid rgba(111,207,151,.4); border-radius: 999px;
     padding: 5px 16px; margin-bottom: 22px;
   }
-  h1 { font-size: 40px; letter-spacing: -.02em; line-height: 1.1; }
+  h1 { font-size: 40px; letter-spacing: -.02em; line-height: 1.15; }
   h1 span { color: var(--leaf); }
-  .sub { color: var(--mist); opacity: .85; margin: 14px auto 26px; font-size: 17px; line-height: 1.6; }
+  .sub { color: var(--mist); opacity: .85; margin: 16px auto 26px; font-size: 17px; line-height: 1.65; }
   .cta {
     display: inline-block; background: var(--leaf); color: #0e1f17; font-weight: 700;
     text-decoration: none; padding: 12px 26px; border-radius: 10px; margin-bottom: 56px;
@@ -66,9 +59,7 @@
   }
   .card.matched .front { box-shadow: 0 0 18px rgba(111,207,151,.45); }
   .status { margin-top: 18px; font-size: 14px; color: var(--mist); opacity: .8; min-height: 22px; }
-  .win {
-    color: var(--glow); font-weight: 600; animation: pop .5s ease;
-  }
+  .win { color: var(--glow); font-weight: 600; animation: pop .5s ease; }
   @keyframes pop { from { transform: scale(.85); opacity: 0; } }
   button.again {
     margin-top: 10px; background: none; color: var(--leaf); border: 1px solid rgba(111,207,151,.4);
@@ -85,13 +76,13 @@
 </head>
 <body>
 
-<div class="leaves" id="leaves"></div>
+<canvas id="sky"></canvas>
 
 <main>
   <div class="badge">Coming soon</div>
-  <h1>Session notes that<br><span>never leave your Mac.</span></h1>
-  <p class="sub">An on-device AI scribe for therapists. No cloud, no account — your clients' words stay between the two of you. Launching soon.</p>
-  <a class="cta" href="mailto:sukhmeetsd@gmail.com?subject=TherapyScribe%20early%20access">Get notified at launch</a>
+  <h1>Your evenings are about<br>to get <span>quieter.</span></h1>
+  <p class="sub">We're building something that hands you back the hours you lose to after-work busywork — gently, privately, and without asking anything of you. It's almost ready.</p>
+  <a class="cta" href="mailto:sukhmeetsd@gmail.com?subject=Early%20access">Get notified at launch</a>
 
   <p class="game-title">While you're here — find the forest pairs 🌿</p>
   <div class="board" id="board"></div>
@@ -102,21 +93,81 @@
 <footer>© 2026 · Built on the West Coast 🌲</footer>
 
 <script>
-  // drifting leaves background
-  const leavesEl = document.getElementById("leaves");
-  const glyphs = ["🍃", "🍂", "🌿"];
-  for (let i = 0; i < 14; i++) {
-    const s = document.createElement("span");
-    s.className = "leaf";
-    s.textContent = glyphs[i % glyphs.length];
-    s.style.left = Math.random() * 100 + "vw";
-    s.style.animationDuration = 9 + Math.random() * 14 + "s";
-    s.style.animationDelay = -Math.random() * 20 + "s";
-    s.style.fontSize = 12 + Math.random() * 14 + "px";
-    leavesEl.appendChild(s);
+  // ---- firefly particles that react to the cursor (desktop) ----
+  const canvas = document.getElementById("sky");
+  const ctx = canvas.getContext("2d");
+  const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  let W, H, dpr;
+  const mouse = { x: -9999, y: -9999 };
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = canvas.clientWidth = window.innerWidth;
+    H = canvas.clientHeight = window.innerHeight;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  window.addEventListener("resize", resize);
+  resize();
+
+  if (fine) {
+    window.addEventListener("mousemove", e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+    window.addEventListener("mouseleave", () => { mouse.x = mouse.y = -9999; });
   }
 
-  // memory match
+  const N = Math.min(90, Math.floor(W * H / 16000));
+  const flies = Array.from({ length: N }, () => ({
+    x: Math.random() * W,
+    y: Math.random() * H,
+    vx: (Math.random() - .5) * .3,
+    vy: (Math.random() - .5) * .3,
+    r: 1 + Math.random() * 2,
+    tw: Math.random() * Math.PI * 2,          // twinkle phase
+    tws: .01 + Math.random() * .03,           // twinkle speed
+  }));
+
+  function tick() {
+    ctx.clearRect(0, 0, W, H);
+    for (const f of flies) {
+      // gentle wander
+      f.vx += (Math.random() - .5) * .02;
+      f.vy += (Math.random() - .5) * .02;
+
+      // cursor: fireflies scatter away within 130px
+      const dx = f.x - mouse.x, dy = f.y - mouse.y;
+      const d2 = dx * dx + dy * dy;
+      if (d2 < 130 * 130) {
+        const d = Math.sqrt(d2) || 1;
+        const push = (130 - d) / 130 * .9;
+        f.vx += dx / d * push;
+        f.vy += dy / d * push;
+      }
+
+      // damping + speed cap
+      f.vx *= .96; f.vy *= .96;
+      const sp = Math.hypot(f.vx, f.vy);
+      if (sp > 2.2) { f.vx = f.vx / sp * 2.2; f.vy = f.vy / sp * 2.2; }
+
+      f.x += f.vx; f.y += f.vy;
+      if (f.x < -10) f.x = W + 10; if (f.x > W + 10) f.x = -10;
+      if (f.y < -10) f.y = H + 10; if (f.y > H + 10) f.y = -10;
+
+      f.tw += f.tws;
+      const a = .25 + .55 * (Math.sin(f.tw) * .5 + .5);
+      const g = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, f.r * 5);
+      g.addColorStop(0, `rgba(168, 230, 195, ${a})`);
+      g.addColorStop(1, "rgba(168, 230, 195, 0)");
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(f.x, f.y, f.r * 5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    requestAnimationFrame(tick);
+  }
+  tick();
+
+  // ---- forest memory match ----
   const EMOJI = ["🦉", "🍄", "🐿️", "🌲", "🪺", "🦌", "🌧️", "🌙"];
   const board = document.getElementById("board");
   const statusEl = document.getElementById("status");
