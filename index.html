@@ -3,103 +3,167 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TherapyScribe — Session notes that never leave your Mac</title>
-<meta name="description" content="On-device AI that turns your session recording into a draft SOAP or DAP note. No cloud, no account, no BAA needed — audio never leaves your Mac.">
+<title>TherapyScribe — Coming Soon</title>
+<meta name="description" content="Session notes that never leave your Mac. Launching soon.">
 <style>
   :root {
-    --ink: #1d2433; --muted: #5a6478; --accent: #2f6f5e; --accent-dark: #245446;
-    --bg: #fafaf7; --card: #ffffff; --line: #e6e4dd;
+    --leaf: #6fcf97; --mist: #cfe8d9; --glow: #a8e6c3;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: -apple-system, "Segoe UI", sans-serif; color: var(--ink); background: var(--bg); line-height: 1.6; }
-  .wrap { max-width: 880px; margin: 0 auto; padding: 0 24px; }
-  header { padding: 96px 0 64px; text-align: center; }
-  .badge { display: inline-block; font-size: 13px; color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 3px 14px; margin-bottom: 20px; }
-  h1 { font-size: 42px; line-height: 1.15; letter-spacing: -0.02em; }
-  .sub { font-size: 19px; color: var(--muted); max-width: 620px; margin: 18px auto 0; }
-  .cta { margin-top: 32px; }
-  .btn { display: inline-block; background: var(--accent); color: #fff; text-decoration: none; padding: 13px 28px; border-radius: 10px; font-weight: 600; }
-  .btn:hover { background: var(--accent-dark); }
-  .cta small { display: block; margin-top: 10px; color: var(--muted); }
-  section { padding: 48px 0; border-top: 1px solid var(--line); }
-  h2 { font-size: 26px; margin-bottom: 24px; letter-spacing: -0.01em; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
-  .card h3 { font-size: 16px; margin-bottom: 6px; }
-  .card p { font-size: 14.5px; color: var(--muted); }
-  .steps li { margin: 10px 0 10px 22px; }
-  .price { text-align: center; }
-  .price .amount { font-size: 44px; font-weight: 700; }
-  .price .amount span { font-size: 17px; font-weight: 400; color: var(--muted); }
-  .reqs, .fineprint { font-size: 14px; color: var(--muted); }
-  .fineprint { border-top: 1px solid var(--line); padding: 28px 0 48px; }
-  .verify { background: #eef4f1; border: 1px solid #d4e3dc; border-radius: 12px; padding: 20px; font-size: 15px; }
-  footer { padding: 24px 0 48px; font-size: 13px; color: var(--muted); text-align: center; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    background: radial-gradient(1200px 800px at 70% -10%, #1d3a2a 0%, #0e1f17 60%);
+    color: #e9f5ee; display: flex; flex-direction: column; align-items: center;
+    min-height: 100%; overflow-x: hidden; padding: 48px 20px;
+  }
+  .leaves { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+  .leaf {
+    position: absolute; top: -5vh; font-size: 18px; opacity: .35;
+    animation: fall linear infinite;
+  }
+  @keyframes fall {
+    to { transform: translateY(110vh) rotate(360deg); }
+  }
+  main { position: relative; z-index: 1; text-align: center; max-width: 560px; }
+  .badge {
+    display: inline-block; font-size: 12px; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--leaf); border: 1px solid rgba(111,207,151,.4); border-radius: 999px;
+    padding: 5px 16px; margin-bottom: 22px;
+  }
+  h1 { font-size: 40px; letter-spacing: -.02em; line-height: 1.1; }
+  h1 span { color: var(--leaf); }
+  .sub { color: var(--mist); opacity: .85; margin: 14px auto 26px; font-size: 17px; line-height: 1.6; }
+  .cta {
+    display: inline-block; background: var(--leaf); color: #0e1f17; font-weight: 700;
+    text-decoration: none; padding: 12px 26px; border-radius: 10px; margin-bottom: 56px;
+    transition: transform .15s ease;
+  }
+  .cta:hover { transform: translateY(-2px); }
+  .game-title { font-size: 14px; color: var(--mist); opacity: .7; margin-bottom: 14px; }
+  .board {
+    display: grid; grid-template-columns: repeat(4, 72px); gap: 10px; justify-content: center;
+    perspective: 700px;
+  }
+  .card {
+    width: 72px; height: 72px; cursor: pointer; position: relative;
+    transform-style: preserve-3d; transition: transform .45s cubic-bezier(.2,.7,.3,1.2);
+  }
+  .card.flipped { transform: rotateY(180deg); }
+  .face {
+    position: absolute; inset: 0; border-radius: 12px; display: flex;
+    align-items: center; justify-content: center; font-size: 30px;
+    backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  }
+  .back {
+    background: linear-gradient(145deg, #1d3a2a, #142b1f);
+    border: 1px solid rgba(168,230,195,.18);
+  }
+  .back::after { content: "🌲"; font-size: 20px; opacity: .35; }
+  .front {
+    background: linear-gradient(145deg, #234633, #1a3526);
+    border: 1px solid rgba(168,230,195,.45); transform: rotateY(180deg);
+  }
+  .card.matched .front { box-shadow: 0 0 18px rgba(111,207,151,.45); }
+  .status { margin-top: 18px; font-size: 14px; color: var(--mist); opacity: .8; min-height: 22px; }
+  .win {
+    color: var(--glow); font-weight: 600; animation: pop .5s ease;
+  }
+  @keyframes pop { from { transform: scale(.85); opacity: 0; } }
+  button.again {
+    margin-top: 10px; background: none; color: var(--leaf); border: 1px solid rgba(111,207,151,.4);
+    border-radius: 8px; padding: 7px 18px; font-size: 13px; cursor: pointer;
+  }
+  button.again:hover { background: rgba(111,207,151,.12); }
+  footer { position: relative; z-index: 1; margin-top: auto; padding-top: 48px; font-size: 12px; color: var(--mist); opacity: .5; }
+  @media (max-width: 420px) {
+    .board { grid-template-columns: repeat(4, 60px); gap: 8px; }
+    .card { width: 60px; height: 60px; }
+    h1 { font-size: 32px; }
+  }
 </style>
 </head>
 <body>
 
-<header class="wrap">
-  <div class="badge">100% on-device · no cloud · no account</div>
-  <h1>Session notes written for you.<br>Audio that never leaves your&nbsp;Mac.</h1>
-  <p class="sub">TherapyScribe turns a session recording into a draft SOAP or DAP note using AI that runs entirely on your Mac. Nothing is uploaded. Ever. There is no server to breach and no third party to trust with your clients' words.</p>
-  <div class="cta">
-    <a class="btn" href="#download">Coming soon — free 14-day trial</a>
-    <small>Then $25/month · cancel anytime · requires an Apple Silicon Mac</small>
-  </div>
-</header>
+<div class="leaves" id="leaves"></div>
 
-<section class="wrap">
-  <h2>Why local matters</h2>
-  <div class="grid">
-    <div class="card">
-      <h3>No BAA required for this tool</h3>
-      <p>Cloud scribes process protected health information on their servers, which is why they need Business Associate Agreements. TherapyScribe processes nothing off your device — there's no business associate in the loop, which keeps your compliance posture dramatically simpler.</p>
-    </div>
-    <div class="card">
-      <h3>Encrypted at rest</h3>
-      <p>Sessions, transcripts, and notes are AES-256 encrypted on disk, with the key in your macOS Keychain. Recordings are deleted automatically once your note is generated (you can turn this off).</p>
-    </div>
-    <div class="card">
-      <h3>Works offline</h3>
-      <p>After a one-time model download, everything works with Wi-Fi off. Airplane mode is a feature, not a bug.</p>
-    </div>
-  </div>
-</section>
+<main>
+  <div class="badge">Coming soon</div>
+  <h1>Session notes that<br><span>never leave your Mac.</span></h1>
+  <p class="sub">An on-device AI scribe for therapists. No cloud, no account — your clients' words stay between the two of you. Launching soon.</p>
+  <a class="cta" href="mailto:sukhmeetsd@gmail.com?subject=TherapyScribe%20early%20access">Get notified at launch</a>
 
-<section class="wrap">
-  <h2>How it works</h2>
-  <ol class="steps">
-    <li>Import your session recording (or record in the app).</li>
-    <li>Your Mac transcribes it and drafts a SOAP or DAP note — on its own chip, in a few minutes.</li>
-    <li>Review, edit, and paste into your EHR. Done.</li>
-  </ol>
-  <p style="margin-top:14px" class="reqs">Notes are drafts: you review and sign off on every note, exactly as you would with an intern's draft. Nothing goes into a record without your eyes on it.</p>
-</section>
+  <p class="game-title">While you're here — find the forest pairs 🌿</p>
+  <div class="board" id="board"></div>
+  <p class="status" id="status">0 moves</p>
+  <button class="again" id="again" hidden>Play again</button>
+</main>
 
-<section class="wrap">
-  <div class="verify">
-    <strong>Don't take our word for it — verify it.</strong>
-    Open Activity Monitor's Network tab (or Little Snitch) and transcribe a session.
-    You will see zero network traffic from TherapyScribe. The only connections this
-    app ever makes are the one-time model download and a license check that sends
-    your license key and nothing else.
-  </div>
-</section>
+<footer>© 2026 · Built on the West Coast 🌲</footer>
 
-<section class="wrap price" id="download">
-  <h2>Pricing</h2>
-  <div class="amount">$25<span>/month</span></div>
-  <p class="reqs" style="margin:6px 0 20px">14-day free trial, full features, no card required.<br>Annual plan $240/year (2 months free).</p>
-  <a class="btn" href="mailto:sukhmeetsd@gmail.com?subject=TherapyScribe%20early%20access">Launching soon — get notified</a>
-  <p class="reqs" style="margin-top:16px">Requires a Mac with Apple Silicon (M1 or later), macOS 14+, 8 GB RAM (16 GB recommended), ~6 GB free disk for the AI models.</p>
-</section>
+<script>
+  // drifting leaves background
+  const leavesEl = document.getElementById("leaves");
+  const glyphs = ["🍃", "🍂", "🌿"];
+  for (let i = 0; i < 14; i++) {
+    const s = document.createElement("span");
+    s.className = "leaf";
+    s.textContent = glyphs[i % glyphs.length];
+    s.style.left = Math.random() * 100 + "vw";
+    s.style.animationDuration = 9 + Math.random() * 14 + "s";
+    s.style.animationDelay = -Math.random() * 20 + "s";
+    s.style.fontSize = 12 + Math.random() * 14 + "px";
+    leavesEl.appendChild(s);
+  }
 
-<div class="wrap fineprint">
-  <p><strong>The honest fine print.</strong> TherapyScribe is a documentation tool, not a compliance product or medical device: it does not make you HIPAA compliant, and we don't claim certification — local processing simply removes the riskiest link (a third-party server) from your documentation workflow. Generated notes are drafts; the clinician is responsible for the accuracy and content of every note placed in a client record.</p>
-</div>
+  // memory match
+  const EMOJI = ["🦉", "🍄", "🐿️", "🌲", "🪺", "🦌", "🌧️", "🌙"];
+  const board = document.getElementById("board");
+  const statusEl = document.getElementById("status");
+  const againBtn = document.getElementById("again");
+  let first = null, lock = false, moves = 0, matched = 0;
 
-<footer>© 2026 TherapyScribe · Built by an independent developer · <a href="mailto:sukhmeetsd@gmail.com">Contact</a></footer>
+  function setup() {
+    board.innerHTML = "";
+    first = null; lock = false; moves = 0; matched = 0;
+    statusEl.textContent = "0 moves";
+    statusEl.classList.remove("win");
+    againBtn.hidden = true;
+    const deck = [...EMOJI, ...EMOJI].sort(() => Math.random() - 0.5);
+    for (const e of deck) {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = '<div class="face back"></div><div class="face front">' + e + "</div>";
+      card.dataset.v = e;
+      card.addEventListener("click", () => flip(card));
+      board.appendChild(card);
+    }
+  }
+
+  function flip(card) {
+    if (lock || card.classList.contains("flipped")) return;
+    card.classList.add("flipped");
+    if (!first) { first = card; return; }
+    moves++;
+    statusEl.textContent = moves + " move" + (moves === 1 ? "" : "s");
+    if (first.dataset.v === card.dataset.v) {
+      first.classList.add("matched"); card.classList.add("matched");
+      first = null; matched++;
+      if (matched === EMOJI.length) {
+        statusEl.textContent = "You found the whole forest in " + moves + " moves 🌲✨";
+        statusEl.classList.add("win");
+        againBtn.hidden = false;
+      }
+    } else {
+      lock = true;
+      const a = first; first = null;
+      setTimeout(() => { a.classList.remove("flipped"); card.classList.remove("flipped"); lock = false; }, 750);
+    }
+  }
+
+  againBtn.addEventListener("click", setup);
+  setup();
+</script>
 
 </body>
 </html>
